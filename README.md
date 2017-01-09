@@ -8,12 +8,12 @@ We have developed an extension on Google Chrome.
 
 ### User Guide
 
-* Download the folder "gscleaner"
+* Download the zip file "gscleaner.zip", and unzip it to get the folder "gscleaner"
 
 * Add the downloaded extension to Chrome 
 
   + Open Google Chrome, find and check "Developer mode" from "Extensions" under "Windows"
-  + "Load unpacked extension..." from the downloaded folder
+  + "Load unpacked extension..." from the downloaded folder "gscleaner"
   + You should find the extenion on your Google Chrome now, at the top right corner
  
 ### See it in Action
