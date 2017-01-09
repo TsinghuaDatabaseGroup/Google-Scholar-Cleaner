@@ -28,4 +28,4 @@ We have developed an extension on Google Chrome.
 
 ### Contact
 
-For any issues or enhancement please use the issue pages in Github, or [contact us](mailto:haoshuang0223@gmail.com). We will try our best to help you sort it out.
+This tool is developed by Shuang Hao (@Tsinghua), Yi Xu(@Tsinghua), Nan Tang(@QCRI), and Guoliang Li(@Tsinghua). For any issues or enhancement please use the issue pages in Github, or [contact us](mailto:haoshuang0223@gmail.com). We will try our best to help you sort it out.
