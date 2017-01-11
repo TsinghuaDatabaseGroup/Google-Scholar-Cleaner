@@ -8,7 +8,7 @@ We have developed an extension on Google Chrome.
 
 ### User Guide
 
-* Download the zip file "gscleaner.zip", and unzip it to get the folder "gscleaner"
+* Download the folder "gscleaner-chrome-extension".
 
 * Add the downloaded extension to Chrome 
 
