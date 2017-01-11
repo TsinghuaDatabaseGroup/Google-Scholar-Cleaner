@@ -1,0 +1,20 @@
+{
+  "name": "Mis-Clustered Paper Cleaner",
+  "description": "Clean mis-clustered papers",
+  "version": "1.0",
+  "permissions": [
+    "tabs", "activeTab", "https://scholar.google.com/*", "http://47.88.79.120:8080/*"
+  ],
+  "browser_action": {
+      "default_title": "Clean mis-clustered papers",
+      "default_icon": "icon.png",
+      "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://scholar.google.com/*"],
+      "js": ["jquery-3.1.1.min.js"]
+    }
+  ],
+  "manifest_version": 2
+}

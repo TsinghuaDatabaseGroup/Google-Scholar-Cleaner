@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Mis-Clustered Paper Cleaner</title>
+    <style>
+      #selectAll {
+        width: 20px;
+        vertical-align: top;
+      }
+      #deleteButton {
+        width: 100px;
+        vertical-align: top;
+      }
+      #numberLabel {
+        vertical-align: 40%;
+      }
+      #trackBar {
+        width: 210px;
+        vertical-align: top;
+      }
+      #table {
+        width: 450px;
+      }
+      #table td {
+        vertical-align: top;
+      }
+      .title {
+        font-size: small;
+      }
+      .other {
+        color: gray;
+        font-size: xx-small;
+      }
+    </style>
+    <script src="jquery-3.1.1.min.js"></script>
+    <script src="radialIndicator.js"></script>
+    <script src="popup.js"></script>
+  </head>
+  <body>
+    <input id="selectAll" type="checkbox" disabled>
+    <button id="deleteButton" disabled>Delete</button>&nbsp;&nbsp;&nbsp;
+    <label id="numberLabel">0/0</label>&nbsp;&nbsp;&nbsp;
+    <input type="range" id="trackBar" min="0" max="3" step="1" value="0" disabled>&nbsp;&nbsp;&nbsp;
+    <span id="indicatorContainer"></span>
+    <table id="table">
+    </table>
+  </body>
+</html>
