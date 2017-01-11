@@ -13,7 +13,7 @@ We have developed an extension on Google Chrome.
 * Add the downloaded extension to Chrome 
 
   + Open Google Chrome, find and check "Developer mode" from "Extensions" under "Windows"
-  + "Load unpacked extension..." from the downloaded folder "gscleaner-chrome-extension"
+  + Under the page of "Extensions", use "Load unpacked extension..." from the downloaded folder "gscleaner-chrome-extension"
   + You should find the extenion on your Google Chrome now, at the top right corner
  
 ### See it in Action
