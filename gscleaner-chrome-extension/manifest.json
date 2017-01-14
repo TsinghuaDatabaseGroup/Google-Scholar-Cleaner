@@ -1,20 +1,14 @@
 {
-  "name": "Mis-Clustered Paper Cleaner",
-  "description": "Clean mis-clustered papers",
+  "name": "Google Scholar Cleaner",
+  "description": "Google Scholar Cleaner is a tool that helps you to easily discover and delete the publications that do not belong to you, but appear in your Google Scholar page.",
   "version": "1.0",
   "permissions": [
-    "tabs", "activeTab", "https://scholar.google.com/*", "http://47.88.79.120:8080/*"
+    "tabs", "activeTab"
   ],
   "browser_action": {
-      "default_title": "Clean mis-clustered papers",
-      "default_icon": "icon.png",
-      "default_popup": "popup.html"
+    "default_title": "Google Scholar Cleaner",
+    "default_icon": "icon.png",
+    "default_popup": "popup.html"
   },
-  "content_scripts": [
-    {
-      "matches": ["https://scholar.google.com/*"],
-      "js": ["jquery-3.1.1.min.js"]
-    }
-  ],
   "manifest_version": 2
 }

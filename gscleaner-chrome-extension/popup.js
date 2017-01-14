@@ -1,19 +1,10 @@
-var last = 0;
-var info;
-var result;
+var last = 0; // number of papers gotten from the page before next "tryMore"
+var info; // info collected from the page
+var result; // result returned by the server
 var server = "http://47.88.79.120:8080/ScholarDemo/";
-var count;
+var count; // number of papers of the author, returned by the server
 
-function getResult(level) { // for test
-    var num = level * window.info.length / 4;
-    var result = [];
-    for (var i = 0; i < num; ++i) {
-        result.push(i);
-    }
-    return result;
-}
-
-function titleToId(input) {
+function titleToId(input) { // convert title to id in the page
     var output = [];
     for (var i = 0; i < input.length; ++i) {
         for (var j = 0; j < window.info.length; ++j) {
@@ -40,63 +31,75 @@ function deleteButtonClick(e) {
     window.close();
 }
 
-function trackBarChange(e) {
-    var level = e.target.value;
-    console.log(level);
-    var selectAll = document.querySelector('#selectAll');
+function slideChange(level) {
+    var selectAll = document.querySelector('#selectAll'); // uncheck all checkboxes
     if (!selectAll.checked) { selectAll.click(); }
     selectAll.click();
-    var table = document.querySelector("#table");
+    var table = document.querySelector("#tbody"); // remove the original table
     for (var i = table.children.length - 1; i >= 0; --i) {
         table.removeChild(table.children[i]);
     }
-    if (level == 0) {
-        document.querySelector('#numberLabel').innerHTML = "0/" + window.info.length;
+    if (level == 0) { // corner case
+        document.querySelector('#numberTip').innerHTML = "0/" + window.info.length;
         return;
     }
-    console.log(window.result);
-    console.log("step_" + (level - 1));
-    var result = titleToId(window.result[0]["step_" + (level - 1)]); // getResult(level);
-    document.querySelector('#numberLabel').innerHTML = result.length + "/" + window.info.length;
+    var result = titleToId(window.result[0]["step_" + (level - 1)]); // main process
+    document.querySelector('#numberTip').innerHTML = result.length + "/" + window.info.length;
     console.log(result);
     for (var i = 0; i < result.length; ++i) {
         var id = result[i];
         var tr = document.createElement("tr");
         tr.innerHTML = `<td><input name="delete" type="checkbox" value="${id}"></td><td><div class="title">${window.info[id].title}</div><div class="other">${window.info[id].author}</div><div class="other">${window.info[id].venue}</div></td>`;
         tr.firstChild.firstChild.addEventListener('click', checkboxClick);
+        tr.firstChild.nextSibling.addEventListener('click', contentClick, true);
         table.appendChild(tr);
     }
+}
+
+function contentClick(e) {
+    e.target.parentNode.parentNode.firstChild.firstChild.click();
 }
 
 function checkboxClick(e) {
     chrome.tabs.executeScript(null, {code: `document.querySelectorAll('.gsc_a_at')[${e.target.value}].parentNode.parentNode.firstChild.firstChild.firstChild.click();`});
 }
 
-function enableAll() {
-    document.querySelector('#selectAll').disabled = false;
-    document.querySelector('#deleteButton').disabled = false;
-    document.querySelector('#trackBar').disabled = false;
+function showMain() { // init to show main window
+    $("#levelSlider").slider({
+        formatter: function(value) {
+            return "";
+        }
+    });
+    $("#levelSlider").on("change", function(slideEvt) {
+        slideChange(slideEvt.value.newValue);
+    });
+    document.querySelector('#selectAll').addEventListener('click', selectAllClick);
+    document.querySelector('#deleteButton').addEventListener('click', deleteButtonClick);
+    document.querySelector('#progressLine').hidden = true;
+    document.querySelector('#sliderLine').hidden = false;
+    document.querySelector('#table').hidden = false;
 }
 
-function timeCount() {
+function timeCount() { // update data preparing process
     $.ajax({
         url: server + "ProgressServlet",
         type: "GET",
         success: function(response) {
-            var radialObj = $('#indicatorContainer').data('radialIndicator');
-            radialObj.value(Number(response));
-            if (radialObj.value() < window.count) {
+            var progressBar = document.querySelector('#progressBar');
+            var progress = Math.round(Number(response) * 100 / window.count);
+            progressBar.setAttribute("aria-valuenow", String(progress));
+            progressBar.setAttribute("style", "width: " + progress + "%");
+            progressBar.innerHTML = progress + "%";
+            if (Number(response) < window.count) {
                 setTimeout(timeCount, 1000);
             } else {
                 $.ajax({
                     url: server + "ScholarServlet",
                     type: "GET",
-                    //data: {"author": request.source.author},
                     success: function(response) {
-                        console.log(response);
                         window.result = JSON.parse(response);
                         console.log(window.result);
-                        enableAll();
+                        showMain();
                     }
                 });
             }
@@ -104,46 +107,35 @@ function timeCount() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelector('#selectAll').addEventListener('click', selectAllClick);
-    document.querySelector('#deleteButton').addEventListener('click', deleteButtonClick);
-    document.querySelector('#trackBar').addEventListener('change', trackBarChange);
-});
-
-chrome.runtime.onMessage.addListener(function(request, sender) {
-    if (request.action == "getInfo") {
+chrome.runtime.onMessage.addListener(function(request, sender) { // interact with the page
+    if (request.action == "tryMore") {
+        if (request.source > window.last) { // need to click "More"
+            chrome.tabs.executeScript(null, {code: "document.querySelector('#gsc_bpf_more').click();"});
+        }
+        window.last = request.source;
+        window.setTimeout(function() { chrome.tabs.executeScript(null, {file: "getInfo.js"}); }, 500); // try again
+    } else if (request.action == "getInfo") { // finish collecting info
         console.log(request.source);
         window.info = request.source.info;
-        for (var i = 0; i < window.info.length; ++i) {
+        for (var i = 0; i < window.info.length; ++i) { // click the boxes which are already checked
             if (window.info[i].checked) {
                 chrome.tabs.executeScript(null, {code: `document.querySelectorAll('.gsc_a_at')[${i}].parentNode.parentNode.firstChild.firstChild.firstChild.click();`});
             }
         }
-        document.querySelector('#numberLabel').innerHTML = "0/" + window.info.length;
-        $.ajax({
+        document.querySelector('#numberTip').innerHTML = "0/" + window.info.length;
+        $.ajax({ // ask server to prepare data
             url: server + "DataServlet",
             type: "GET",
             data: {"author": request.source.author, "url": request.source.url, "number": String(window.info.length)},
             success: function(response) {
                 console.log(response);
                 window.count = Number(response);
-                $('#indicatorContainer').data('radialIndicator').option("maxValue", window.count);
                 timeCount();
             }
         });
-    } else if (request.action == "tryMore") {
-        if (request.source > window.last) {
-            chrome.tabs.executeScript(null, {code: "document.querySelector('#gsc_bpf_more').click();"});
-        }
-        window.last = request.source;
-        window.setTimeout(function() { chrome.tabs.executeScript(null, {file: "getInfo.js"}); }, 500);
     }
 });
 
-window.onload = function() {
-    $('#indicatorContainer').radialIndicator({
-        displayNumber: false,
-        radius: 5
-    });
+document.addEventListener('DOMContentLoaded', function() { // entrance
     chrome.tabs.executeScript(null, {file: "getInfo.js"});
-};
+});

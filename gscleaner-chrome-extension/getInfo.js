@@ -1,41 +1,17 @@
-var paperList = Array.from(document.querySelectorAll(".gsc_a_at"));
-var resultList = [];
-var index = 0;
-main();
+var inputList = Array.from(document.querySelectorAll(".gsc_a_at")); // dom nodes of papers gotten from the page
+var outputList = []; // info to return
 
-function main() {
-    if (!document.querySelector("#gsc_bpf_more").hasAttribute("disabled")) {
-        chrome.runtime.sendMessage({
-            action: "tryMore",
-            source: paperList.length
-        });
-        return;
+if (!document.querySelector("#gsc_bpf_more").hasAttribute("disabled")) { // the page is not complete
+    chrome.runtime.sendMessage({
+        action: "tryMore",
+        source: inputList.length
+    });
+} else { // convert and return info
+    for (var i = 0; i < inputList.length; ++i) {
+        outputList.push({title: inputList[i].innerHTML, author: inputList[i].nextSibling.innerHTML, venue: inputList[i].nextSibling.nextSibling.innerHTML, checked: inputList[i].parentNode.parentNode.firstChild.firstChild.firstChild.checked});
     }
-    getNext();
-}
-
-function getNext() {
-    console.log(index);
-    if (index < paperList.length) {
-        /*$.ajax({
-            url: paperList[index].href,
-            type: "GET",
-            error: function() {
-                console.log('error');
-            },
-            success: function(response, status, xhr) {
-                resultList.push({title: paperList[index].innerHTML, author: $(response).find(".gsc_value").html(), venue: paperList[index].nextSibling.nextSibling.innerHTML});
-                ++index;
-                getNext();
-            }
-        });*/
-        resultList.push({title: paperList[index].innerHTML, author: paperList[index].nextSibling.innerHTML, venue: paperList[index].nextSibling.nextSibling.innerHTML, checked: paperList[index].parentNode.parentNode.firstChild.firstChild.firstChild.checked});
-        ++index;
-        getNext();
-    } else {
-        chrome.runtime.sendMessage({
-            action: "getInfo",
-            source: {"author": document.querySelector("#gsc_prf_in").innerHTML, "url": window.location.href, "info": resultList}
-        });
-    }
+    chrome.runtime.sendMessage({
+        action: "getInfo",
+        source: {"author": document.querySelector("#gsc_prf_in").innerHTML, "url": window.location.href, "info": outputList}
+    });
 }

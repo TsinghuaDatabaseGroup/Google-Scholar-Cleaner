@@ -1,48 +1,73 @@
 <!doctype html>
 <html>
   <head>
-    <title>Mis-Clustered Paper Cleaner</title>
+    <title>Google Scholar Cleaner</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap-slider.css">
     <style>
-      #selectAll {
-        width: 20px;
-        vertical-align: top;
+      body {
+        width: 500px;
+        margin: 10px;
+        font-size: small;
+        font-family: Helvetica;
+      }
+      .progress {
+        margin-bottom: 0px;
+      }
+      #numberTip {
+        font-size: xx-small;
+        color: #555;
+      }
+      #sliderLine {
+        background-color: #EEE;
+        padding: 10px;
       }
       #deleteButton {
-        width: 100px;
-        vertical-align: top;
+        margin-left: 240px;
+        width: 150px;
       }
-      #numberLabel {
-        vertical-align: 40%;
+      #levelSlider {
+        margin-left: 20px;
+        width: 410px;
       }
-      #trackBar {
-        width: 210px;
-        vertical-align: top;
+      #levelSlider .slider-handle {
+        outline: none;
       }
-      #table {
-        width: 450px;
+      #levelSlider .slider-selection {
+        background: #BABABA;
+      }
+      #table th {
+        vertical-align: text-bottom;
       }
       #table td {
-        vertical-align: top;
+        vertical-align: text-top;
       }
-      .title {
-        font-size: small;
-      }
-      .other {
-        color: gray;
+      #table .other {
+        color: #555;
         font-size: xx-small;
       }
     </style>
-    <script src="jquery-3.1.1.min.js"></script>
-    <script src="radialIndicator.js"></script>
+    <script src="jquery.min.js"></script>
+    <script src="bootstrap-slider.js"></script>
     <script src="popup.js"></script>
   </head>
   <body>
-    <input id="selectAll" type="checkbox" disabled>
-    <button id="deleteButton" disabled>Delete</button>&nbsp;&nbsp;&nbsp;
-    <label id="numberLabel">0/0</label>&nbsp;&nbsp;&nbsp;
-    <input type="range" id="trackBar" min="0" max="3" step="1" value="0" disabled>&nbsp;&nbsp;&nbsp;
-    <span id="indicatorContainer"></span>
-    <table id="table">
+    <div id="progressLine" class="progress">
+      <div id="progressBar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">0%</div>
+    </div>
+    <div id="sliderLine" hidden>
+      <span id="numberTip">0/0</span>
+      <input id="levelSlider" data-slider-id="levelSlider" type="text" data-slider-min="0" data-slider-max="3" data-slider-step="1" data-slider-value="0">
+    </div>
+    <table id="table" class="table table-hover" hidden>
+      <thead>
+        <tr>
+          <th><input id="selectAll" type="checkbox"></th>
+          <th>Select All<button id="deleteButton" class="btn btn-danger btn-sm">Delete</button></th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+      </tbody>
     </table>
   </body>
 </html>
