@@ -3,6 +3,8 @@ var info; // info collected from the page
 var result; // result returned by the server
 var server = "http://47.88.79.120:8080/ScholarDemo/";
 var count; // number of papers of the author, returned by the server
+var author; // author of the page
+var authorID; // unique ID extracted from the url
 
 function titleToId(input) { // convert title to id in the page
     var output = [];
@@ -85,6 +87,7 @@ function timeCount() { // update data preparing process
     $.ajax({
         url: server + "ProgressServlet",
         type: "GET",
+        data: {"authorID": window.authorID},
         success: function(response) {
             var progressBar = document.querySelector('#progressBar');
             var progress = Math.round(Number(response) * 100 / window.count);
@@ -97,6 +100,7 @@ function timeCount() { // update data preparing process
                 $.ajax({
                     url: server + "ScholarServlet",
                     type: "GET",
+                    data: {"author": window.author, "authorID": window.authorID},
                     success: function(response) {
                         window.result = JSON.parse(response);
                         console.log(window.result);
@@ -118,6 +122,8 @@ chrome.runtime.onMessage.addListener(function(request, sender) { // interact wit
     } else if (request.action == "getInfo") { // finish collecting info
         console.log(request.source);
         window.info = request.source.info;
+        window.author = request.source.author;
+        window.authorID = request.source.url.substring(request.source.url.indexOf("user") + 5, request.source.url.indexOf("user") + 17);
         for (var i = 0; i < window.info.length; ++i) { // click the boxes which are already checked
             if (window.info[i].checked) {
                 chrome.tabs.executeScript(null, {code: `document.querySelectorAll('.gsc_a_at')[${i}].parentNode.parentNode.firstChild.firstChild.firstChild.click();`});
@@ -139,7 +145,7 @@ chrome.runtime.onMessage.addListener(function(request, sender) { // interact wit
         $.ajax({
             url: server + "DeleteServlet",
             type: "POST",
-            data: {"deletion": JSON.stringify(request.source)}
+            data: {"authorID": window.authorID, "deletion": JSON.stringify(request.source)}
         });
     }
 });
