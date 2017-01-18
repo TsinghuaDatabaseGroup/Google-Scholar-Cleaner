@@ -27,6 +27,7 @@ function selectAllClick(e) {
 }
 
 function deleteButtonClick(e) {
+    chrome.tabs.executeScript(null, {file: "collectDeletion.js"});
     chrome.tabs.executeScript(null, {code: "document.querySelector('#gsc_btn_del').click();"});
     window.close();
 }
@@ -132,6 +133,13 @@ chrome.runtime.onMessage.addListener(function(request, sender) { // interact wit
                 window.count = Number(response);
                 timeCount();
             }
+        });
+    } else if (request.action == "collectDeletion") { // finish collecting deletion
+        console.log(request.source);
+        $.ajax({
+            url: server + "DeleteServlet",
+            type: "POST",
+            data: {"deletion": JSON.stringify(request.source)}
         });
     }
 });
